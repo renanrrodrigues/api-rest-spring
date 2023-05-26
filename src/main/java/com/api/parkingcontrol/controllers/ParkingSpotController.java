@@ -4,6 +4,7 @@ import com.api.parkingcontrol.dtos.ParkingSpotDto;
 import com.api.parkingcontrol.models.ParkingSpotModel;
 import com.api.parkingcontrol.services.ParkingSpotService;
 import jakarta.validation.Valid;
+import org.apache.coyote.Response;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,7 +65,7 @@ public class ParkingSpotController {
         return ResponseEntity.status(HttpStatus.OK).body(parkingSpotModelOptional.get());
     }
 
-    // implementação do método PUT
+    // implementação do método delete
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteParkingSpot(@PathVariable(value = "id") UUID id){
         Optional<ParkingSpotModel> parkingSpotModelOptional = parkingSpotService.findById(id);
@@ -73,6 +74,29 @@ public class ParkingSpotController {
         }
         parkingSpotService.delete(parkingSpotModelOptional.get());
         return ResponseEntity.status(HttpStatus.OK).body("Veículo deletado com sucesso!");
+    }
+
+    // implementação do método put
+    @PutMapping("/{id}")
+    public ResponseEntity<Object> updateParkingSpot(@PathVariable(value = "id") UUID id,
+                                                    @RequestBody @Valid ParkingSpotDto parkingSpotDto){
+        Optional<ParkingSpotModel> parkingSpotModelOptional = parkingSpotService.findById(id);
+        if (!parkingSpotModelOptional.isPresent()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não foi encontrado nenhum veículo com esse ID!");
+        }
+        var parkingSpotModel = parkingSpotModelOptional.get(); // recebe um novo objeto ParkingSpotModel
+
+        parkingSpotModel.setParkingSpotNumber(parkingSpotDto.getParkingSpotNumber());
+        parkingSpotModel.setLicensePlateCar(parkingSpotDto.getLicensePlateCar());
+        parkingSpotModel.setModelCar(parkingSpotDto.getModelCar());
+        parkingSpotModel.setBrandCar(parkingSpotDto.getBrandCar());
+        parkingSpotModel.setColorCar(parkingSpotDto.getColorCar());
+        parkingSpotModel.setResponsibleName(parkingSpotDto.getResponsibleName());
+        parkingSpotModel.setApartment(parkingSpotDto.getApartment());
+        parkingSpotModel.setBlock(parkingSpotDto.getBlock());
+
+        return ResponseEntity.status(HttpStatus.OK).body(parkingSpotService.save(parkingSpotModel)); // retorna o objeto salvo
+
     }
 
 
