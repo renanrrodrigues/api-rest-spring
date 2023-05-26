@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 
 // ** todos os comentários são apenas para fins didáticos **
@@ -52,4 +54,25 @@ public class ParkingSpotController {
     public ResponseEntity<List<ParkingSpotModel>> getAllParkingSpots() {
         return ResponseEntity.status(HttpStatus.OK).body(parkingSpotService.findAll());
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Object> getOneParkingSpot(@PathVariable(value = "id") UUID id){
+        Optional<ParkingSpotModel> parkingSpotModelOptional = parkingSpotService.findById(id);
+        if(!parkingSpotModelOptional.isPresent()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não foi encontrado nenhum veículo com esse ID!");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(parkingSpotModelOptional.get());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Object> deleteParkingSpot(@PathVariable(value = "id") UUID id){
+        Optional<ParkingSpotModel> parkingSpotModelOptional = parkingSpotService.findById(id);
+        if(!parkingSpotModelOptional.isPresent()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não foi encontrado nenhum veículo com esse ID!");
+        }
+        parkingSpotService.delete(parkingSpotModelOptional.get());
+        return ResponseEntity.status(HttpStatus.OK).body("Veículo deletado com sucesso!");
+    }
+
+
 }
